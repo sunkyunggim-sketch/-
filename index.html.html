@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>벤담과 밀: 행복의 가치를 어떻게 판단할까?</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7d;
+      --line: #dfe5ee;
+      --paper: #ffffff;
+      --bg: #f4f7fb;
+      --bentham: #1769aa;
+      --bentham-soft: #e9f4ff;
+      --mill: #7357c8;
+      --mill-soft: #f0ecff;
+      --accent: #0b7a66;
+      --accent-soft: #e9f8f4;
+      --good: #16784b;
+      --good-soft: #e9f8f0;
+      --bad: #b33a3a;
+      --bad-soft: #fff0f0;
+      --shadow: 0 14px 38px rgba(25, 39, 67, .09);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(23, 105, 170, .09), transparent 30rem),
+        radial-gradient(circle at 90% 0%, rgba(115, 87, 200, .09), transparent 30rem),
+        var(--bg);
+      font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    button { font: inherit; }
+    .wrap { width: min(980px, calc(100% - 32px)); margin: 0 auto; }
+
+    header {
+      padding: 48px 0 26px;
+      text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border: 1px solid #cfd9e8;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      color: #3e506b;
+      font-size: .88rem;
+      font-weight: 800;
+    }
+    h1 {
+      margin: 16px auto 8px;
+      font-size: clamp(1.85rem, 5vw, 3.15rem);
+      line-height: 1.18;
+      letter-spacing: -.04em;
+    }
+    .subtitle { margin: 0 auto; max-width: 720px; color: var(--muted); font-size: 1.03rem; }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255,255,255,.96);
+      box-shadow: var(--shadow);
+    }
+
+    .intro { padding: clamp(22px, 4vw, 38px); }
+    .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0; }
+    .thinker {
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+    }
+    .thinker.bentham { background: var(--bentham-soft); border-color: #bddcf4; }
+    .thinker.mill { background: var(--mill-soft); border-color: #d5c9ff; }
+    .thinker h2 { margin: 0 0 6px; font-size: 1.25rem; }
+    .thinker p { margin: 0; color: #35425a; }
+    .tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      font-size: .82rem;
+      font-weight: 800;
+    }
+    .notice {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border-left: 5px solid #e4a11b;
+      border-radius: 12px;
+      background: #fff8e8;
+      color: #55431e;
+    }
+
+    .primary, .secondary {
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .primary:hover, .secondary:hover { transform: translateY(-1px); filter: brightness(.98); }
+    .primary:focus-visible, .secondary:focus-visible, .option:focus-visible {
+      outline: 4px solid rgba(23,105,170,.2);
+      outline-offset: 2px;
+    }
+    .primary { padding: 14px 22px; background: var(--ink); color: white; }
+    .secondary { padding: 12px 18px; background: #edf1f7; color: var(--ink); }
+    .intro .primary { display: block; width: min(360px, 100%); margin: 24px auto 0; }
+
+    #activity, #result { display: none; }
+    .activity-shell { padding: clamp(18px, 3.5vw, 34px); }
+    .topbar { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; margin-bottom: 22px; }
+    .progress-track { height: 12px; overflow: hidden; border-radius: 999px; background: #e7ebf1; }
+    .progress-fill { height: 100%; width: 10%; border-radius: inherit; background: linear-gradient(90deg, var(--bentham), var(--mill)); transition: width .3s ease; }
+    .counter { font-weight: 900; color: #445169; white-space: nowrap; }
+
+    .case-kicker { margin: 0; color: var(--accent); font-weight: 900; font-size: .9rem; }
+    .case-title { margin: 4px 0 18px; font-size: clamp(1.35rem, 3.5vw, 2rem); letter-spacing: -.02em; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .choice-card {
+      padding: 20px;
+      border: 2px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      color: var(--ink);
+      transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    }
+    .choice-card:hover { transform: translateY(-2px); border-color: #9aabc2; }
+    .choice-card.selected { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 3px rgba(11,122,102,.1); }
+    .choice-label {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      background: #edf2f8;
+      font-weight: 950;
+    }
+    .choice-card.selected .choice-label { background: var(--accent); color: white; }
+    .choice-card h3 { margin: 12px 0 5px; font-size: 1.12rem; }
+    .choice-card p { margin: 0; color: var(--muted); }
+
+    .step {
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+    }
+    .step h3 { margin: 0 0 4px; font-size: 1.08rem; }
+    .helper { margin: 0 0 12px; color: var(--muted); font-size: .92rem; }
+    .basis-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+    .option {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid #ccd5e2;
+      border-radius: 13px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-weight: 750;
+    }
+    .option:hover { background: #f7f9fc; }
+    .option.selected { border-color: var(--accent); background: var(--accent-soft); color: #075f50; }
+    .option:disabled { cursor: not-allowed; opacity: .56; }
+
+    .lens {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      border: 1px solid #ccd6e5;
+      border-radius: 18px;
+      background: #f8fafd;
+    }
+    .lens.visible { display: block; animation: rise .25s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+    .claim {
+      margin: 10px 0 15px;
+      padding: 16px;
+      border-radius: 13px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 1.03rem;
+      font-weight: 800;
+    }
+    .philosopher-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .philosopher-buttons .option { text-align: center; font-size: 1rem; }
+    .option.correct { border-color: var(--good); background: var(--good-soft); color: #0b5c39; }
+    .option.wrong { border-color: var(--bad); background: var(--bad-soft); color: #8d2929; }
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid;
+    }
+    .feedback.show { display: block; animation: rise .2s ease both; }
+    .feedback.good { background: var(--good-soft); border-color: #a9dfc3; }
+    .feedback.bad { background: var(--bad-soft); border-color: #efbcbc; }
+    .feedback strong { display: block; margin-bottom: 4px; }
+    .feedback p { margin: 0; }
+    .two-lenses { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .mini-lens { padding: 12px; border-radius: 12px; background: rgba(255,255,255,.72); font-size: .9rem; }
+    .mini-lens b { display: block; margin-bottom: 3px; }
+    .next-row { display: flex; justify-content: flex-end; margin-top: 18px; }
+    #nextBtn { display: none; }
+
+    .result-card { padding: clamp(24px, 5vw, 44px); text-align: center; }
+    .score-ring {
+      width: 150px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin: 16px auto;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent) var(--score-angle), #e5eaf1 0);
+      position: relative;
+    }
+    .score-ring::before { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: white; }
+    .score-value { position: relative; font-size: 2rem; font-weight: 950; }
+    .result-title { margin: 6px 0; font-size: 1.7rem; }
+    .result-copy { margin: 0 auto 18px; max-width: 650px; color: var(--muted); }
+    .basis-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 20px 0; }
+    .summary-box { padding: 13px 8px; border-radius: 14px; background: #f3f6fa; }
+    .summary-box b { display: block; font-size: 1.35rem; }
+    .summary-box span { color: var(--muted); font-size: .82rem; }
+    .result-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .final-note { margin: 22px auto 0; padding: 16px; max-width: 720px; border-radius: 14px; background: #fff8e8; text-align: left; }
+
+    details { margin: 24px 0 50px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.85); }
+    summary { padding: 15px 18px; cursor: pointer; font-weight: 900; }
+    details .inside { padding: 0 18px 18px; color: #465269; }
+    details ul { margin-bottom: 0; }
+
+    footer { padding: 12px 0 28px; text-align: center; color: #778195; font-size: .82rem; }
+
+    @media (max-width: 700px) {
+      header { padding-top: 32px; }
+      .intro-grid, .choices, .basis-grid, .two-lenses { grid-template-columns: 1fr; }
+      .philosopher-buttons { grid-template-columns: 1fr 1fr; }
+      .basis-summary { grid-template-columns: repeat(2, 1fr); }
+      .wrap { width: min(100% - 20px, 980px); }
+    }
+
+    @media print {
+      body { background: white; }
+      header, #intro, #activity, details, footer, .result-actions { display: none !important; }
+      #result { display: block !important; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <span class="eyebrow">중학교 도덕 · 공리주의 탐구</span>
+    <h1>행복의 가치를 어떻게 판단할까?</h1>
+    <p class="subtitle">A와 B 중 더 가치 있다고 생각하는 행복을 고른 뒤, 그 판단이 벤담과 밀 중 누구의 기준에 가까운지 알아봅니다.</p>
+  </header>
+
+  <main class="wrap">
+    <section id="intro" class="card intro" aria-labelledby="introTitle">
+      <h2 id="introTitle">먼저 두 기준을 기억해요</h2>
+      <div class="intro-grid">
+        <article class="thinker bentham">
+          <h2>벤담의 기준</h2>
+          <p>쾌락의 종류를 미리 높고 낮게 나누지 않고, 강도·지속성·확실성·범위 등 <b>쾌락의 양</b>을 비교합니다.</p>
+          <span class="tag">핵심어: 양적 공리주의</span>
+        </article>
+        <article class="thinker mill">
+          <h2>밀의 기준</h2>
+          <p>쾌락의 양뿐 아니라 질도 살피며, 사고력·상상력·도덕적 감정 등 <b>인간의 높은 능력을 사용하는 쾌락</b>을 더 높게 봅니다.</p>
+          <span class="tag">핵심어: 질적 공리주의</span>
+        </article>
+      </div>
+      <div class="notice"><b>꼭 기억하기:</b> 벤담이 육체적 쾌락을 더 중요하게 본 것은 아닙니다. 벤담은 종류보다 양을, 밀은 양과 함께 질도 중요하게 보았습니다.</div>
+      <button id="startBtn" class="primary" type="button">10가지 행복 비교 시작하기</button>
+    </section>
+
+    <section id="activity" class="card activity-shell" aria-live="polite">
+      <div class="topbar">
+        <div class="progress-track" aria-label="진행률"><div id="progressFill" class="progress-fill"></div></div>
+        <div id="counter" class="counter">1 / 10</div>
+      </div>
+
+      <p id="caseKicker" class="case-kicker"></p>
+      <h2 id="caseTitle" class="case-title"></h2>
+      <div class="step">
+        <h3>① 나는 어떤 행복을 더 가치 있다고 생각하나요?</h3>
+        <p class="helper">개인의 선택이므로 정답이 없습니다. A 또는 B를 선택하세요.</p>
+        <div id="choices" class="choices"></div>
+      </div>
+
+      <div class="step">
+        <h3>② 나는 무엇을 기준으로 판단했나요?</h3>
+        <p class="helper">가장 가까운 기준 하나를 선택하세요.</p>
+        <div id="basisGrid" class="basis-grid">
+          <button class="option basis" type="button" data-basis="quantity" disabled>행복의 양<br><small>강도·시간·확실성·범위 등</small></button>
+          <button class="option basis" type="button" data-basis="quality" disabled>행복의 질<br><small>사고력·상상력·도덕적 감정 등</small></button>
+          <button class="option basis" type="button" data-basis="both" disabled>양과 질 모두</button>
+          <button class="option basis" type="button" data-basis="other" disabled>취향이나 다른 이유</button>
+        </div>
+      </div>
+
+      <section id="lens" class="lens" aria-labelledby="lensTitle">
+        <h3 id="lensTitle">③ 다음 판단은 누구의 관점에 가까울까요?</h3>
+        <p id="claim" class="claim"></p>
+        <div id="philosopherButtons" class="philosopher-buttons">
+          <button class="option philosopher" type="button" data-philosopher="bentham">벤담</button>
+          <button class="option philosopher" type="button" data-philosopher="mill">밀</button>
+        </div>
+        <div id="feedback" class="feedback"></div>
+        <div class="next-row"><button id="nextBtn" class="primary" type="button">다음 사례</button></div>
+      </section>
+    </section>
+
+    <section id="result" class="card result-card" aria-live="polite"></section>
+
+    <details>
+      <summary>교사용 활용 안내</summary>
+      <div class="inside">
+        <ul>
+          <li>개인 선택과 판단 기준은 채점하지 않으며, 철학자 관점 문항만 10점으로 채점됩니다.</li>
+          <li>정답 확인 뒤 “벤담이라면 반드시 A 또는 B를 고를 수 있는가?”를 물으면 양적 계산에 필요한 정보의 중요성을 설명할 수 있습니다.</li>
+          <li>“책·예술은 언제나 높은 쾌락인가?”를 추가로 묻고, 활동에 실제로 사고력과 상상력을 사용했는지 살펴보게 할 수 있습니다.</li>
+          <li>마지막 결과는 학생의 고정된 성향을 뜻하지 않으며, 이번 활동에서 사용한 판단 기준만 보여 줍니다.</li>
+        </ul>
+      </div>
+    </details>
+  </main>
+
+  <footer>벤담과 밀의 행복 판단 기준 학습 활동</footer>
+
+  <script>
+    const cases = [
+      {
+        kicker: "사례 1 · 휴식과 독서",
+        title: "같은 30분, 어떤 행복이 더 가치 있을까?",
+        aTitle: "시원한 방에서 낮잠 자기",
+        aText: "선풍기를 켜고 편안하게 30분 동안 낮잠을 잔다.",
+        bTitle: "고전소설 읽기",
+        bText: "고전소설을 읽으며 인물의 선택과 삶의 의미를 생각한다.",
+        claim: "B는 사고력과 상상력 같은 인간의 높은 능력을 사용하므로 질적으로 더 높은 쾌락이라고 볼 수 있다.",
+        answer: "mill",
+        explanation: "쾌락의 질과 인간의 높은 정신 능력을 기준으로 판단했으므로 밀의 관점입니다.",
+        bentham: "낮잠과 독서라는 종류만으로 결정하지 않고 실제 강도·지속성·확실성 등을 비교합니다.",
+        mill: "내용을 이해하고 깊이 생각하는 독서는 인간의 높은 능력을 사용하는 정신적·지적 쾌락이 될 수 있습니다."
+      },
+      {
+        kicker: "사례 2 · 인원과 범위",
+        title: "많은 사람의 즐거움과 소수의 깊은 즐거움",
+        aTitle: "반 전체 간식 시간",
+        aText: "25명이 함께 간식을 먹으며 짧지만 확실한 즐거움을 느낀다.",
+        bTitle: "두 명의 깊은 퍼즐 활동",
+        bText: "2명이 어려운 논리 퍼즐을 풀며 깊은 지적 즐거움을 느낀다.",
+        claim: "행복의 종류에 순위를 매기기보다, 몇 명에게 얼마나 크고 확실한 즐거움이 생기는지 모두 계산해야 한다.",
+        answer: "bentham",
+        explanation: "쾌락의 종류가 아니라 강도와 범위 등 행복의 양을 계산하므로 벤담의 관점입니다.",
+        bentham: "25명이라는 범위뿐 아니라 각 사람이 느끼는 강도와 지속성까지 함께 계산해야 합니다.",
+        mill: "단순한 감각적 즐거움과 사고력을 사용하는 지적 즐거움 사이의 질적 차이도 살핍니다."
+      },
+      {
+        kicker: "사례 3 · 영상과 연습",
+        title: "즉시 즐거운 활동과 노력이 필요한 활동",
+        aTitle: "짧은 재미 영상 보기",
+        aText: "15분 동안 재미있는 영상을 보며 즉각적인 즐거움을 느낀다.",
+        bTitle: "악기 연습하기",
+        bText: "처음에는 어렵지만 한 시간 연습하여 한 곡을 연주한다.",
+        claim: "A가 실제로 더 강하고 확실한 즐거움을 주며 뒤따르는 고통도 적다면, 영상이라는 이유만으로 낮은 행복이라고 할 수 없다.",
+        answer: "bentham",
+        explanation: "활동의 종류를 미리 낮게 평가하지 않고 실제 쾌락의 양을 비교하므로 벤담의 관점입니다.",
+        bentham: "현재의 강도뿐 아니라 지속성·다산성·순수성까지 계산하면 A와 B 중 어느 쪽도 선택될 수 있습니다.",
+        mill: "창의성과 숙련을 사용하는 악기 연주를 더 높은 능력의 쾌락으로 평가할 가능성이 큽니다."
+      },
+      {
+        kicker: "사례 4 · 놀이와 감상",
+        title: "짜릿한 즐거움과 생각하는 즐거움",
+        aTitle: "놀이기구 타기",
+        aText: "놀이기구를 타며 강하고 짜릿한 즐거움을 느낀다.",
+        bTitle: "미술 작품 해석하기",
+        bText: "작품을 감상하고 작가가 전하려는 의미를 친구와 토론한다.",
+        claim: "B는 감상에 그치지 않고 해석과 토론을 통해 사고력과 상상력을 사용하므로 질적으로 더 높은 행복이라고 볼 수 있다.",
+        answer: "mill",
+        explanation: "인간의 높은 정신 능력을 사용하는지를 기준으로 쾌락의 질을 판단했으므로 밀의 관점입니다.",
+        bentham: "놀이와 예술의 종류를 가리지 않고 실제로 생긴 쾌락의 총량을 비교합니다.",
+        mill: "해석·상상·토론을 동반한 예술 감상은 높은 정신 능력을 사용하는 쾌락이 될 수 있습니다."
+      },
+      {
+        kicker: "사례 5 · 두 가지 게임",
+        title: "게임도 서로 다른 질의 행복일까?",
+        aTitle: "단순 터치 게임",
+        aText: "화면을 빠르게 누르며 짧고 즉각적인 재미를 느낀다.",
+        bTitle: "협력 전략 게임",
+        bText: "팀원과 계획을 세우고 문제를 해결하며 공동 목표를 달성한다.",
+        claim: "둘 다 게임이지만, B가 계획·판단·협력 같은 높은 능력을 더 많이 사용한다면 질적으로 더 높은 쾌락이 될 수 있다.",
+        answer: "mill",
+        explanation: "장르가 아니라 활동 속에서 높은 능력이 발휘되는지를 살폈으므로 밀의 관점입니다.",
+        bentham: "두 게임이 주는 재미의 강도·지속성·영향 범위를 실제로 계산합니다.",
+        mill: "모든 게임을 낮은 쾌락으로 보지 않고, 어떤 능력을 사용하게 하는지에 따라 질을 판단할 수 있습니다."
+      },
+      {
+        kicker: "사례 6 · 강도와 지속성",
+        title: "강렬한 5분과 편안한 40분",
+        aTitle: "좋아하는 디저트 먹기",
+        aText: "5분 동안 매우 강하고 즉각적인 즐거움을 느낀다.",
+        bTitle: "가족과 산책하기",
+        bText: "40분 동안 대화를 나누며 잔잔하고 편안한 즐거움을 느낀다.",
+        claim: "A의 강도가 더 세더라도 B의 즐거움이 더 오래가고 뒤따르는 불편이 적다면 전체 쾌락의 양은 B가 더 클 수 있다.",
+        answer: "bentham",
+        explanation: "강도·지속성·순수성 등 여러 요소를 이용해 쾌락의 총량을 비교하므로 벤담의 관점입니다.",
+        bentham: "강도 하나로 결정하지 않고 지속성·순수성 등 일곱 요소를 종합합니다.",
+        mill: "산책 중의 깊은 대화가 사고와 관계의 능력을 사용한다면 질적인 가치도 살필 수 있습니다."
+      },
+      {
+        kicker: "사례 7 · 대중성과 예술성",
+        title: "많이 웃는 공연과 깊이 생각하는 공연",
+        aTitle: "100명이 즐기는 코미디",
+        aText: "100명의 관객이 공연을 보며 크게 웃고 즐거워한다.",
+        bTitle: "10명이 보는 어려운 연극",
+        bText: "10명의 관객이 작품을 깊이 이해하고 인간의 삶을 성찰한다.",
+        claim: "코미디인지 연극인지보다, 관객 수와 각 관객의 즐거움의 강도·지속성을 합해 어느 쪽의 행복이 더 큰지 판단해야 한다.",
+        answer: "bentham",
+        explanation: "종류에 질적 순위를 매기지 않고 범위와 강도 등 쾌락의 양을 합산하므로 벤담의 관점입니다.",
+        bentham: "많은 사람이 즐겼다는 사실은 범위에서 유리하지만, 다른 요소들도 함께 계산해야 합니다.",
+        mill: "두 공연을 모두 경험하고 판단할 능력이 있는 사람이 숙고하여 무엇을 선호하는지도 중요합니다."
+      },
+      {
+        kicker: "사례 8 · 보상과 도덕적 감정",
+        title: "상을 받는 기쁨과 누군가를 돕는 보람",
+        aTitle: "대회에서 상품 받기",
+        aText: "원하던 상품을 받아 큰 기쁨과 만족을 느낀다.",
+        bTitle: "친구의 학습 돕기",
+        bText: "어려워하는 친구를 돕고 함께 성장했다는 보람을 느낀다.",
+        claim: "B에서 느끼는 보람은 공감과 도덕적 감정 같은 인간의 높은 능력을 사용하므로 더 높은 질의 행복이 될 수 있다.",
+        answer: "mill",
+        explanation: "공감과 도덕적 감정이라는 높은 능력을 기준으로 쾌락의 질을 판단했으므로 밀의 관점입니다.",
+        bentham: "보상과 도움 중 무엇이든 실제로 더 크고 오래가며 많은 사람에게 영향을 주는 행복인지 계산합니다.",
+        mill: "도덕적 감정과 타인에 대한 배려에서 오는 만족을 높은 차원의 행복으로 볼 수 있습니다."
+      },
+      {
+        kicker: "사례 9 · 감상과 창작",
+        title: "듣는 즐거움과 만드는 즐거움",
+        aTitle: "좋아하는 음악 듣기",
+        aText: "익숙한 노래를 들으며 편안하고 즐거운 기분을 느낀다.",
+        bTitle: "직접 음악 만들기",
+        bText: "리듬과 가사를 고민하며 짧은 곡을 창작한다.",
+        claim: "B는 창의성·판단력·상상력을 적극적으로 사용하므로 단순히 듣는 즐거움보다 질적으로 더 높은 쾌락이 될 수 있다.",
+        answer: "mill",
+        explanation: "창의성·판단력·상상력 등 인간의 높은 능력을 기준으로 삼았으므로 밀의 관점입니다.",
+        bentham: "감상과 창작 중 실제 쾌락의 양이 더 큰 활동을 고르며, 창작이라고 자동으로 더 높게 보지 않습니다.",
+        mill: "스스로 창작하는 활동은 높은 정신 능력을 적극적으로 사용하는 쾌락이 될 수 있습니다."
+      },
+      {
+        kicker: "사례 10 · 이름보다 실제 경험",
+        title: "피곤할 때의 낮잠과 억지로 하는 독서",
+        aTitle: "충분히 쉬기",
+        aText: "매우 피곤한 상태에서 30분 동안 낮잠을 자고 개운함을 느낀다.",
+        bTitle: "내용을 모른 채 책 읽기",
+        bText: "어려운 책을 이해하지 못한 채 억지로 30분 동안 읽는다.",
+        claim: "책이라는 이유만으로 B가 더 가치 있다고 할 수 없다. 실제로 A가 더 강하고 확실한 만족을 주고 이후의 활동에도 도움을 준다면 A의 쾌락의 양이 더 클 수 있다.",
+        answer: "bentham",
+        explanation: "활동의 이름이나 종류가 아니라 실제 쾌락의 강도·확실성·다산성 등을 비교하므로 벤담의 관점입니다.",
+        bentham: "충분한 휴식이 이후의 즐거움을 낳는다면 다산성에서도 높은 평가를 받을 수 있습니다.",
+        mill: "단순히 책을 펼쳤다고 높은 쾌락이 되는 것은 아닙니다. 실제로 이해·사고·상상 등 높은 능력을 사용해야 합니다."
+      }
+    ];
+
+    const state = {
+      index: 0,
+      score: 0,
+      answered: false,
+      personalChoice: null,
+      basis: null,
+      basisCounts: { quantity: 0, quality: 0, both: 0, other: 0 }
+    };
+
+    const intro = document.getElementById("intro");
+    const activity = document.getElementById("activity");
+    const result = document.getElementById("result");
+    const progressFill = document.getElementById("progressFill");
+    const counter = document.getElementById("counter");
+    const caseKicker = document.getElementById("caseKicker");
+    const caseTitle = document.getElementById("caseTitle");
+    const choices = document.getElementById("choices");
+    const lens = document.getElementById("lens");
+    const claim = document.getElementById("claim");
+    const feedback = document.getElementById("feedback");
+    const nextBtn = document.getElementById("nextBtn");
+
+    document.getElementById("startBtn").addEventListener("click", function () {
+      intro.style.display = "none";
+      activity.style.display = "block";
+      renderCase();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    function renderCase() {
+      const item = cases[state.index];
+      state.answered = false;
+      state.personalChoice = null;
+      state.basis = null;
+      progressFill.style.width = ((state.index + 1) / cases.length * 100) + "%";
+      counter.textContent = (state.index + 1) + " / " + cases.length;
+      caseKicker.textContent = item.kicker;
+      caseTitle.textContent = item.title;
+      choices.innerHTML =
+        '<button class="choice-card" type="button" data-choice="A">' +
+          '<span class="choice-label">A</span><h3>' + item.aTitle + '</h3><p>' + item.aText + '</p></button>' +
+        '<button class="choice-card" type="button" data-choice="B">' +
+          '<span class="choice-label">B</span><h3>' + item.bTitle + '</h3><p>' + item.bText + '</p></button>';
+
+      document.querySelectorAll(".basis").forEach(function (button) {
+        button.disabled = true;
+        button.classList.remove("selected");
+      });
+      document.querySelectorAll(".philosopher").forEach(function (button) {
+        button.disabled = false;
+        button.classList.remove("correct", "wrong", "selected");
+      });
+      lens.classList.remove("visible");
+      claim.textContent = item.claim;
+      feedback.className = "feedback";
+      feedback.innerHTML = "";
+      nextBtn.style.display = "none";
+      nextBtn.textContent = state.index === cases.length - 1 ? "결과 보기" : "다음 사례";
+
+      document.querySelectorAll(".choice-card").forEach(function (button) {
+        button.addEventListener("click", function () {
+          state.personalChoice = button.dataset.choice;
+          document.querySelectorAll(".choice-card").forEach(function (b) { b.classList.remove("selected"); });
+          button.classList.add("selected");
+          document.querySelectorAll(".basis").forEach(function (b) { b.disabled = false; });
+        });
+      });
+    }
+
+    document.querySelectorAll(".basis").forEach(function (button) {
+      button.addEventListener("click", function () {
+        state.basis = button.dataset.basis;
+        document.querySelectorAll(".basis").forEach(function (b) { b.classList.remove("selected"); });
+        button.classList.add("selected");
+        lens.classList.add("visible");
+        lens.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    document.querySelectorAll(".philosopher").forEach(function (button) {
+      button.addEventListener("click", function () {
+        if (state.answered) return;
+        state.answered = true;
+        const item = cases[state.index];
+        const selected = button.dataset.philosopher;
+        const isCorrect = selected === item.answer;
+        if (isCorrect) state.score += 1;
+        state.basisCounts[state.basis] += 1;
+
+        document.querySelectorAll(".choice-card, .basis").forEach(function (b) {
+          b.disabled = true;
+        });
+
+        document.querySelectorAll(".philosopher").forEach(function (b) {
+          b.disabled = true;
+          if (b.dataset.philosopher === item.answer) b.classList.add("correct");
+        });
+        if (!isCorrect) button.classList.add("wrong");
+
+        feedback.className = "feedback show " + (isCorrect ? "good" : "bad");
+        feedback.innerHTML =
+          '<strong>' + (isCorrect ? '정답입니다!' : '다시 기억해 볼까요? 정답은 ' + (item.answer === 'bentham' ? '벤담' : '밀') + '입니다.') + '</strong>' +
+          '<p>' + item.explanation + '</p>' +
+          '<div class="two-lenses"><div class="mini-lens"><b style="color:var(--bentham)">벤담의 눈</b>' + item.bentham + '</div>' +
+          '<div class="mini-lens"><b style="color:var(--mill)">밀의 눈</b>' + item.mill + '</div></div>';
+        nextBtn.style.display = "inline-block";
+        feedback.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    });
+
+    nextBtn.addEventListener("click", function () {
+      if (state.index < cases.length - 1) {
+        state.index += 1;
+        renderCase();
+        activity.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        showResult();
+      }
+    });
+
+    function showResult() {
+      activity.style.display = "none";
+      result.style.display = "block";
+      const percent = Math.round(state.score / cases.length * 100);
+      let message = "두 철학자의 기준을 한 번 더 비교해 봅시다.";
+      if (state.score >= 9) message = "벤담과 밀의 판단 기준을 매우 정확하게 구별했습니다.";
+      else if (state.score >= 7) message = "핵심 기준을 잘 이해했습니다. 틀린 사례의 해설을 떠올려 보세요.";
+      else if (state.score >= 5) message = "기본 차이는 이해했습니다. ‘종류가 아니라 양’과 ‘높은 능력과 질’을 다시 구별해 보세요.";
+
+      result.innerHTML =
+        '<p class="case-kicker">활동 완료</p>' +
+        '<h2 class="result-title">나의 관점 구별 점수</h2>' +
+        '<div class="score-ring" style="--score-angle:' + (percent * 3.6) + 'deg"><span class="score-value">' + state.score + '/10</span></div>' +
+        '<p class="result-copy">' + message + '</p>' +
+        '<h3>내가 이번 활동에서 사용한 판단 기준</h3>' +
+        '<div class="basis-summary">' +
+          '<div class="summary-box"><b>' + state.basisCounts.quantity + '</b><span>행복의 양</span></div>' +
+          '<div class="summary-box"><b>' + state.basisCounts.quality + '</b><span>행복의 질</span></div>' +
+          '<div class="summary-box"><b>' + state.basisCounts.both + '</b><span>양과 질 모두</span></div>' +
+          '<div class="summary-box"><b>' + state.basisCounts.other + '</b><span>취향·다른 이유</span></div>' +
+        '</div>' +
+        '<p class="result-copy">이 결과는 여러분의 성격을 정하는 검사가 아닙니다. 오늘 열 가지 사례에서 어떤 기준을 자주 사용했는지만 보여 줍니다.</p>' +
+        '<div class="final-note"><b>마지막 핵심 정리</b><br>벤담은 육체적 쾌락을 더 중요하게 본 것이 아니라 <b>쾌락의 종류를 미리 높고 낮게 나누지 않고 양을 비교</b>했습니다. 밀은 감각적 쾌락도 행복으로 인정했지만, <b>인간의 높은 능력을 사용하는 정신적·지적 쾌락을 질적으로 더 높게</b> 보았습니다.</div>' +
+        '<div class="result-actions"><button id="retryBtn" class="primary" type="button">처음부터 다시 하기</button><button id="printBtn" class="secondary" type="button">결과 인쇄</button></div>';
+
+      document.getElementById("retryBtn").addEventListener("click", resetActivity);
+      document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetActivity() {
+      state.index = 0;
+      state.score = 0;
+      state.answered = false;
+      state.personalChoice = null;
+      state.basis = null;
+      state.basisCounts = { quantity: 0, quality: 0, both: 0, other: 0 };
+      result.style.display = "none";
+      activity.style.display = "block";
+      renderCase();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
